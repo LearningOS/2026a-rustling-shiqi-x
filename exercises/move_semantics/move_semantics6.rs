@@ -9,13 +9,17 @@
 fn main() {
     let data = "Rust is great!".to_string();
 
-    get_char(data.clone());
+    println!("The last char of the data is : {}.", get_char(&data.clone()));
+
+    println!("The value of data is : {}", data);
 
     string_uppercase(data);
+
+    // println!("{}", data); // string_uppercase takes ownership of the data.
 }
 
 // Should not take ownership
-fn get_char(data: String) -> char {
+fn get_char(data: &String) -> char {
     data.chars().last().unwrap()
 }
 
@@ -23,5 +27,5 @@ fn get_char(data: String) -> char {
 fn string_uppercase(mut data: String) {
     data.to_uppercase();
 
-    println!("{}", data);
+    println!("Uppercase of the data : {}", data);
 }
