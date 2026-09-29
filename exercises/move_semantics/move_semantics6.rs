@@ -23,7 +23,7 @@ fn get_char(data: &String) -> char {
     data.chars().last().unwrap()
 }
 
-// Should take ownership
+// Should take rusownership
 fn string_uppercase(mut data: String) {
     data.to_uppercase();
 
