@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -41,9 +40,11 @@ impl<T> LinkedList<T> {
             length: 0,
             start: None,
             end: None,
-        }
+        }   
     }
+}
 
+impl<T: std::cmp::PartialOrd> LinkedList<T> {
     pub fn add(&mut self, obj: T) {
         let mut node = Box::new(Node::new(obj));
         node.next = None;
@@ -69,15 +70,64 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut list_c = LinkedList::new();
+
+        let mut ptr_a = list_a.start;
+        let mut ptr_b = list_b.start;
+
+        while let (Some(node_a), Some(node_b)) = (ptr_a, ptr_b) {
+            unsafe {
+                if (*node_a.as_ptr()).val <= (*node_b.as_ptr()).val {
+                    list_a.start = (*node_a.as_ptr()).next;
+                    ptr_a = list_a.start;
+                    list_a.length -= 1;
+                    list_c.push_node(node_a);
+                }
+                else {
+                    list_b.start = (*node_b.as_ptr()).next;
+                    ptr_b = list_b.start;
+                    list_b.length -= 1;
+                    list_c.push_node(node_b);
+                }
+            }
         }
+
+        while let Some(node_a) = ptr_a {
+            unsafe {
+                list_a.start = (*node_a.as_ptr()).next;
+                ptr_a = list_a.start;
+                list_a.length -= 1;
+                list_c.push_node(node_a);
+            }
+        }
+
+        while let Some(node_b) = ptr_b {
+            unsafe {
+                list_b.start = (*node_b.as_ptr()).next;
+                ptr_b = list_b.start;
+                list_b.length -= 1;
+                list_c.push_node(node_b);
+            }
+        }
+
+        list_c
 	}
+
+    fn push_node(&mut self, node_ptr: NonNull<Node<T>>) {
+        unsafe { (*node_ptr.as_ptr()).next = None };
+        let node_ptr = Some(node_ptr);
+        
+        match self.end {
+            None => self.start = node_ptr,
+            Some(end_ptr) => unsafe { (*end_ptr.as_ptr()).next = node_ptr }
+        }
+        self.end = node_ptr;
+        self.length += 1;
+    }    
 }
 
 impl<T> Display for LinkedList<T>
